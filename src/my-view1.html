@@ -1,0 +1,113 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/app-layout/helpers/helpers.html">
+
+<dom-module id="my-view1">
+
+  <template>
+
+    <style>
+    :host {
+      display: block;
+      padding: 10px;
+    }
+    .card-holder {
+      display: flex;
+      flex-direction: column;
+    }
+    .card {
+      padding: 1;
+      margin: 0;
+      border-radius: 0;
+      background-color: #fff;
+      color: #757575;
+      width: 50%;
+    }
+    h2 {
+      font-size: 1.1em;
+      margin: 0;
+      color: #212121;
+    }
+
+    input[is=iron-input] {
+      width: 100%;
+      box-sizing: border-box;
+    }
+    input, button {
+      font-size: 20px;
+      padding: 0.2em;
+    }
+    </style>
+
+<div id="bigHolder">
+    <iron-ajax auto url="http://www.omdbapi.com/?s=[[search]]&amp;page=[[page]]" params='{"r":"json"}' handle-as="json" last-response="{{ajaxResponse}}" debounce-duration="300"></iron-ajax>
+
+    <div class="input">
+      <h2>
+        Buscá la pelicula, serie o episodio sobre el que querés hablar
+      </h2>
+      <form class="" action="#" method="get">
+        <input is="iron-input" bind-value="{{search}}" value="{{value::input}}">
+        <template is="dom-if" if="{{search}}">
+          <p>Estás buscando: [[search]]</p>
+        </template>
+      </form>
+    </div>
+
+    <div class="card-holder">
+    <template is="dom-repeat" items="[[ajaxResponse.Search]]" as="item">
+      <div class="card">
+        <div class="horizontal-section">
+          <h2><a href="#">[[item.Title]]</a></h2>
+          <iron-image class="poster-img" src="[[item.Poster]]" width="300" height="428" sizing="cover" preload fade></iron-image>
+          <p>[[item.Plot]]</p>
+          <p>[[item.imdbID]]</p>
+        </div>
+      </div>
+    </template>
+    </div>
+
+    <div id="demo"></div>
+    <template is="dom-if" if="{{search}}">
+      <paper-button raised on-tap="siguiente">Siguiente</paper-button>
+    </template>
+  </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-view1',
+      properties: {
+        search: {
+          type: String,
+          notify: true
+        },
+        page: {
+          type: Number,
+          value: 1,
+          notify: true
+        }
+      },
+      ready: function() {
+        console.log("Hey, bienvenido a Episode Talk!")
+      },
+      siguiente: function(e) {
+        this.page = this.page+1;
+        Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
+      }
+    });
+  </script>
+</dom-module>
